@@ -1,12 +1,22 @@
 import React from 'react';
-import propTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeContact } from '../../../redux/store';
 import { nanoid } from 'nanoid';
 import './ContactListItem.css';
 
-export default function ContactListItem({ contacts, onDeleteContact }) {
+export default function ContactListItem() {
+  const dispatch = useDispatch();
+
+  const contactsList = useSelector(state => state.contacts.items);
+  const filterName = useSelector(state => state.contacts.filter);
+
+  const filterList = contactsList.filter(el =>
+    el.name.toLowerCase().includes(filterName.toLowerCase())
+  );
+
   return (
     <>
-      {contacts.map(({ id, name, number }) => (
+      {filterList.map(({ id, name, number }) => (
         <li key={nanoid()} className="contacts__li" id={id}>
           <div className="contacts__data">
             <p className="contacts__name">{name}: </p>
@@ -16,7 +26,7 @@ export default function ContactListItem({ contacts, onDeleteContact }) {
             className="contacts__btn"
             type="button"
             onClick={() => {
-              onDeleteContact(id);
+              dispatch(removeContact(id));
             }}
           >
             Delete
@@ -26,8 +36,3 @@ export default function ContactListItem({ contacts, onDeleteContact }) {
     </>
   );
 }
-
-ContactListItem.propTypes = {
-  contacts: propTypes.array,
-  onDeleteContact: propTypes.func,
-};
